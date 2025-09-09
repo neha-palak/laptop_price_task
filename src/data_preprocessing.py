@@ -15,5 +15,5 @@ def preprocess_data(input_path, output_path):
     df.to_csv(output_path, index=False)
 
 if __name__ == "__main__":
-    preprocess_data("data/Laptop Price Raw.csv", "data/processed_train.csv")
+    preprocess_data('/Users/nehapalak/cs3410/Jahnavi_Neha_A1/laptop_price_task/data/Laptop Price Raw.csv', '/Users/nehapalak/cs3410/Jahnavi_Neha_A1/laptop_price_task/data/processed_train.csv')
 
