@@ -61,12 +61,3 @@ if __name__ == "__main__":
         f.write(f"Root Mean Squared Error (RMSE): {rmse:.2f}\n")
         f.write(f"R-squared (R²) Score: {r2:.2f}\n")
 
-
-
-# run the following command to execute this program:
-
-# python3 src/predict.py \
-# --model_path models/regression_model_final.pkl \
-# --data_path data/processed_train.csv \
-# --metrics_output_path results/train_metrics.txt \
-# --predictions_output_path results/train_predictions.csv
