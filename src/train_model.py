@@ -25,6 +25,31 @@ def ridge_regression(X, y, lam=1.0):
     theta = np.linalg.pinv(X_b.T @ X_b + lam * I) @ X_b.T @ y
     return theta
 
+def lasso_regression(X, y, lam=0.1, max_iter=1000, tol=1e-6):
+    """Lasso using coordinate descent"""
+    X_b = add_bias(X)
+    m, n = X_b.shape
+    theta = np.zeros(n)
+    
+    for _ in range(max_iter):
+        theta_old = theta.copy()
+        for j in range(n):
+            X_j = X_b[:, j]
+            residual = y - X_b @ theta + theta[j] * X_j
+            rho = X_j.T @ residual
+            if j == 0:  # bias (no penalty)
+                theta[j] = rho / (X_j.T @ X_j)
+            else:
+                if rho < -lam / 2:
+                    theta[j] = (rho + lam / 2) / (X_j.T @ X_j)
+                elif rho > lam / 2:
+                    theta[j] = (rho - lam / 2) / (X_j.T @ X_j)
+                else:
+                    theta[j] = 0
+        if np.linalg.norm(theta - theta_old, ord=1) < tol:
+            break
+    return theta
+
 def evaluate(X, y, theta):
     X_b = add_bias(X)
     preds = X_b @ theta
@@ -60,14 +85,28 @@ if __name__ == "__main__":
     with open(os.path.join(MODELS_DIR, "regression_model3.pkl"), "wb") as f:
         pickle.dump(theta_ridge, f)
 
+    # 4. Lasso Regression
+    theta_lasso = lasso_regression(X, y, lam=0.1)
+    with open(os.path.join(MODELS_DIR, "regression_model4.pkl"), "wb") as f:
+        pickle.dump(theta_lasso, f)
+
+
     # Pick best model (example: based on R²)
     mse1, rmse1, r21 = evaluate(X, y, theta_lin)
     mse2, rmse2, r22 = evaluate(X_poly, y, theta_poly)
     mse3, rmse3, r23 = evaluate(X, y, theta_ridge)
+    mse4, rmse4, r24 = evaluate(X, y, theta_lasso)
+
+    print("\nModel Evaluation Results:")
+    print(f"Linear Regression     -> R² = {r21:.4f}, RMSE = {rmse1:.4f}")
+    print(f"Polynomial Regression -> R² = {r22:.4f}, RMSE = {rmse2:.4f}")
+    print(f"Ridge Regression      -> R² = {r23:.4f}, RMSE = {rmse3:.4f}")
+    print(f"Lasso Regression      -> R² = {r24:.4f}, RMSE = {rmse4:.4f}")
 
     best = max([(r21, "lin", theta_lin),
                 (r22, "poly", (theta_poly, 2)),
-                (r23, "ridge", theta_ridge)], key=lambda x: x[0])
+                (r23, "ridge", theta_ridge),
+                (r24, "lasso", theta_lasso)], key=lambda x: x[0])
 
     with open(os.path.join(MODELS_DIR, "regression_model_final.pkl"), "wb") as f:
         pickle.dump(best[2], f)
