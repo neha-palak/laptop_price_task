@@ -121,7 +121,7 @@ if __name__ == "__main__":
         pickle.dump(best[2], f)
 
     # Save metrics
-    metrics_path = os.path.join(RESULTS_DIR, "train_metrics.txt")
+    metrics_path = os.path.join(RESULTS, "train_metrics.txt")
     with open(metrics_path, "w") as f:
         f.write("Regression Metrics:\n")
         f.write(f"Mean Squared Error (MSE): {best[0]:.2f}\n")
