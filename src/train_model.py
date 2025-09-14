@@ -69,7 +69,6 @@ if __name__ == "__main__":
     X = df.drop("Price", axis=1).values
     y = df["Price"].values
 
-    # ---------- Train–Test Split ----------
     np.random.seed(42)
     indices = np.random.permutation(len(X))
     split = int(0.8 * len(X))
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     X_train, X_test = X[train_idx], X[test_idx]
     y_train, y_test = y[train_idx], y[test_idx]
 
-    BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # project root
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))  
     MODELS_DIR = os.path.join(BASE_DIR, "models")
     RESULTS_DIR = os.path.join(BASE_DIR, "results")
     os.makedirs(MODELS_DIR, exist_ok=True)
@@ -111,6 +110,12 @@ if __name__ == "__main__":
     mse3, rmse3, r23 = evaluate(X_test, y_test, theta_ridge)
     mse4, rmse4, r24 = evaluate(X_test, y_test, theta_lasso)
 
+    print("\nModel Evaluation Results:")
+    print(f"Linear Regression     -> R² = {r21:.4f}, RMSE = {rmse1:.4f}")
+    print(f"Polynomial Regression -> R² = {r22:.4f}, RMSE = {rmse2:.4f}")
+    print(f"Ridge Regression      -> R² = {r23:.4f}, RMSE = {rmse3:.4f}")
+    print(f"Lasso Regression      -> R² = {r24:.4f}, RMSE = {rmse4:.4f}")
+
     # Choose best based on R²
     best = max([(r21, "lin", theta_lin),
                 (r22, "poly", (theta_poly, 2)),
@@ -119,13 +124,5 @@ if __name__ == "__main__":
 
     with open(os.path.join(MODELS_DIR, "regression_model_final.pkl"), "wb") as f:
         pickle.dump(best[2], f)
-
-    # Save metrics
-    metrics_path = os.path.join(RESULTS, "train_metrics.txt")
-    with open(metrics_path, "w") as f:
-        f.write("Regression Metrics:\n")
-        f.write(f"Mean Squared Error (MSE): {best[0]:.2f}\n")
-        f.write(f"Root Mean Squared Error (RMSE): {np.sqrt(best[0]):.2f}\n")
-        f.write(f"R-squared (R²) Score: {best[0]:.2f}\n")
 
     print("Models trained and saved. Best:", best[1], "R² =", best[0])
